@@ -3,67 +3,67 @@ import sys
 input = sys.stdin.readline
 
 
-def check_area_ok(arr, maxH, A):
-    print("got area", A)
-    maxH = min(maxH, A)
-    lH, rH = 1, maxH
-    while True:
-        midH = (lH + rH + 1) // 2
-        minN = (A + midH - 1) // midH
-        print(midH, minN)
+class Stack:
+    def __init__(self):
+        self.arr = []
 
-        # H should higher
-        if minN > len(arr):
-            lH = midH + 1
-            if lH > rH:
-                break
-            continue
+    def empty(self):
+        return len(self.arr) == 0
 
-        cnt = 0
-        for h in arr:
-            if h >= midH:
-                cnt += 1
-            else:
-                cnt = 0
+    def top(self):
+        if self.empty():
+            print("TOP EMPTY ERROR")
+            exit()
+        return self.arr[-1]
 
-            if cnt == minN:
-                break
+    def push(self, val1, val2):
+        self.arr.append((val1, val2))
+        return
 
-        if cnt == minN:
-            return True
-
-        # H should shorter
-        rH = midH - 1
-        if lH > rH:
-            break
-
-    return False
+    def pop(self):
+        if self.empty():
+            print("POP EMPTY ERROR")
+            exit()
+        ret = self.top()
+        self.arr.pop()
+        return ret
 
 
 while True:
     got = input().split(" ")
-    print(got)
     if len(got) == 1:
         break
     arr = list(map(int, got))
     N = arr[0]
     arr = arr[1:]
-    print(N, arr)
 
-    maxH = max(arr)
-    maxArea = N * maxH
+    maxA = 0
+    stack = Stack()
+    stack.push(0, -1)
+    for ci, ch in enumerate(arr):
+        if stack.empty():
+            stack.push(ch, ci)
+            continue
 
-    lA, rA = 1, maxArea
+        put_idx = ci
+        while not stack.empty():
+            bh, bi = stack.top()
+            if bh <= ch:
+                break
+            put_idx = bi
 
-    # find upper bound of area
-    while True:
-        midA = (lA + rA + 1) // 2
-        if check_area_ok(arr, maxH, midA):
-            rA = midA
-        else:
-            lA = midA + 1
+            stack.pop()
+            curA = bh * (ci - bi)
+            if curA > maxA:
+                maxA = curA
 
-        if lA == rA:
-            break
+        if bh != ch:
+            stack.push(ch, put_idx)
 
-    print(rA)
+    while not stack.empty():
+        h, i = stack.pop()
+        curA = h * (len(arr) - i)
+        if curA > maxA:
+            maxA = curA
+
+    print(maxA)

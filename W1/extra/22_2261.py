@@ -1,4 +1,4 @@
-import sys, math
+import sys, math, bisect
 
 input = sys.stdin.readline
 MAX = math.inf
@@ -136,55 +136,50 @@ def DM_with_mode(left, right, minX, maxX, minY, maxY, mode):
     if result == 0:
         return 0
 
-    # minAxis = -MAX
-    # maxAxis = MAX
-    # for i in range(left, mid):
-    #     if points[i][mode] > minAxis:
-    #         minAxis = points[i][mode]
-    # for i in range(mid, right):
-    #     if points[i][mode] < maxAxis:
-    #         maxAxis = points[i][mode]
-
-    # axis = (maxAxis + minAxis) // 2
-
     keyfunction = sortbyCoordAxis[mode](axis)
 
     left_points = sorted(points[left:mid], key=keyfunction)
     right_points = sorted(points[mid:right], key=keyfunction)
-    points[left:mid] = left_points
-    points[mid:right] = right_points
 
-    lp, rp = left, mid
-    lpoint, rpoint = points[lp], points[rp]
+    compressed_lefts = []
+    compressed_rights = []
+    compressed_lefts.append(left_points[0])
+    compressed_rights.append(right_points[0])
 
-    print("merge part")
-    # 이분탐색 써서 가장 가까운 반대편 점 찾기
-    print(left, right, mid, mode, axis)
-    print(left_points)
-    print(right_points)
-    while lp != mid - 1 or rp != right - 1:
-        if lpoint[(mode + 1) % 2] != points[lp][(mode + 1) % 2]:
-            lpoint = points[lp]
-        if rpoint[(mode + 1) % 2] != points[rp][(mode + 1) % 2]:
-            rpoint = points[rp]
+    for lp in left_points:
+        if compressed_lefts[-1][(mode + 1) % 2] != lp[(mode + 1) % 2]:
+            compressed_lefts.append(lp)
 
-        print(lp, rp, mid)
-        print(points[lp], points[rp])
-        print(lpoint, rpoint)
-        print()
+    for rp in right_points:
+        if compressed_rights[-1][(mode + 1) % 2] != rp[(mode + 1) % 2]:
+            compressed_rights.append(rp)
 
-        dist = getDist(lpoint, rpoint)
-        if dist < result:
-            result = dist
+    # print(left, mid, right, mode)
+    # print(left_points)
+    # print(compressed_lefts)
 
-        if lp == mid - 1:
-            rp += 1
-        elif rp == right - 1:
-            lp += 1
-        elif points[lp][(mode + 1) % 2] < points[rp][(mode + 1) % 2]:
-            lp += 1
-        else:
-            rp += 1
+    # print(right_points)
+    # print(compressed_rights)
+
+    for lp in compressed_lefts:
+        mid = lp[(mode + 1) % 2]
+        gap = math.sqrt(result)
+
+        left_bound = bisect.bisect_left(
+            compressed_rights, mid - gap, key=get[(mode + 1) % 2]
+        )
+        right_bound = bisect.bisect_right(
+            compressed_rights, mid + gap, key=get[(mode + 1) % 2]
+        )
+
+        # print(lp, gap)
+        # print(compressed_rights[left_bound:right_bound])
+
+        for rp in compressed_rights[left_bound:right_bound]:
+            dist = getDist(lp, rp)
+            if dist < result:
+                result = dist
+                # print(dist)
 
     # print("done merge")
 

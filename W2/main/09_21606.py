@@ -13,32 +13,41 @@ for _ in range(N - 1):
     edges[e].append(s)
 
 
+visited = [False] * (N + 1)
+visited[0] = True
+
+
 cnt = 0
 
 for i in range(1, N + 1):
-    if len(edges[i]) > 0:
-        # dfs from i
-        ins = 0
-        nexts = []
-        nexts[i] = True
+    if inout[i] == 1:
+        visited[i] = True
         for next in edges[i]:
+            if inout[next] == 1:
+                cnt += 1
+
+
+def dfs(cur):
+    nexts = [cur]
+    visited[cur] = True
+    insides = 0
+    while len(nexts) > 0:
+        cur = nexts.pop()
+        for next in edges[cur]:
+            if visited[next]:
+                if inout[next] == 1:
+                    insides += 1
+                continue
             nexts.append(next)
             visited[next] = True
-        if inout[i] == 1:
-            ins += 1
 
-        while len(nexts) > 0:
-            cur = nexts.pop()
-            if inout[cur] == 1:
-                ins += 1
-                continue
+    return insides
 
-            for next in edges[cur]:
-                if not visited[next]:
-                    visited[next] = True
-                    nexts.append(next)
 
-        # print(ins)
-        cnt += ins * (ins - 1)
+for i in range(1, N + 1):
+    if not visited[i]:
+        insides = dfs(i)
+        cnt += insides * (insides - 1)
+
 
 print(cnt)

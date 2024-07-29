@@ -1,6 +1,7 @@
-# 25min
+# 32 min
 N = int(input())
 arr = list(map(int, input().split(" ")))
+INF = 98765
 
 
 def get_ab(idx):
@@ -8,12 +9,15 @@ def get_ab(idx):
         if arr[idx] == arr[idx + 2]:
             return 0, arr[idx]
         else:
-            return 98765, 98765
+            return INF, INF
     b = (arr[idx + 1] ** 2 - arr[idx] * arr[idx + 2]) // (arr[idx + 1] - arr[idx])
-    a = (arr[idx + 1] - b) // arr[idx]
+    if arr[idx] != 0:
+        a = (arr[idx + 1] - b) // arr[idx]
+    else:
+        a = (arr[idx + 2] - b) // arr[idx + 1]
 
-    if arr[idx + 2] != a * arr[idx + 1] + b:
-        return 98765, 98765
+    if arr[idx + 2] != a * arr[idx + 1] + b or arr[idx + 1] != a * arr[idx] + b:
+        return INF, INF
     else:
         return a, b
 
@@ -23,7 +27,7 @@ if N >= 3:
     check_ok = True
     for i in range(N - 2):
         cur_ab = get_ab(i)
-        if first_ab != cur_ab or cur_ab == (98765, 98765):
+        if first_ab != cur_ab or cur_ab == (INF, INF):
             check_ok = False
             break
     if not check_ok:

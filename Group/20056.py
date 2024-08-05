@@ -6,13 +6,6 @@ input = sys.stdin.readline
 dr = [-1, -1, 0, 1, 1, 1, 0, -1]
 dc = [0, 1, 1, 1, 0, -1, -1, -1]
 
-
-# ret = (mass, dir, s)
-def get_new_fire(fires):
-    if len(fires) == 0:
-        return ()
-
-
 N, M, K = map(int, input().split(" "))
 fire_map = [[[] for _ in range(N + 1)] for _ in range(N + 1)]
 
@@ -68,4 +61,5 @@ for r in range(1, N + 1):
     for c in range(1, N + 1):
         for fire in fire_map[r][c]:
             mass_sum += fire[0]
+
 print(mass_sum)
